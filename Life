@@ -1,0 +1,187 @@
+import random
+
+
+class Human:
+    def __init__(self, name="Human", job=None, home=None, car=None):
+        self.name = name
+        self.job = job
+        self.home = home
+        self.car = car
+        self.money = 100
+        self.gladness = 50
+        self.satiety = 50
+
+    def get_home(self):
+        self.home = House()
+
+    def get_car(self):
+        self.car = Auto(brands_of_car)
+
+    def get_job(self):
+        if self.car and self.car.drive():
+            self.job = Job(jobs_list)
+        else:
+            self.to_repair()
+
+    def eat(self):
+        if not self.home or self.home.food <= 0:
+            self.shopping("food")
+        else:
+            if self.satiety >= 100:
+                self.satiety = 100
+            else:
+                self.satiety += 5
+                self.home.food -= 5
+
+    def work(self):
+        if self.car and self.car.drive():
+            if self.car.fuel < 20:
+                self.shopping("fuel")
+            else:
+                self.money += self.job.salary
+                self.gladness -= self.job.gladness_less
+                self.satiety -= 4
+        else:
+            self.to_repair()
+
+    def shopping(self, manage):
+        if self.car and self.car.drive():
+            if manage == "fuel":
+                print("I bought fuel for the car.")
+                self.money -= 100
+                self.car.fuel += 100
+            elif manage == "food":
+                print("I bought food for home.")
+                self.money -= 50
+                self.home.food += 50
+            elif manage == "delicacies":
+                print("Hooray! Delicious!")
+                self.gladness += 10
+                self.satiety += 2
+                self.money -= 15
+        else:
+            self.to_repair()
+
+    def chill(self):
+        self.gladness += 10
+        self.home.mess += 5
+
+    def clean_house(self):
+        if self.home:
+            self.gladness -= 5
+            self.home.mess = 0
+
+    def to_repair(self):
+        if self.car:
+            self.car.strength += 100
+            self.money -= 50
+
+    def days_indexes(self, day):
+        day_description = f"Today is day {day} of {self.name}'s life"
+        print(f"{day_description:=^50}")
+        print(f"Money: {self.money}")
+        print(f"Satiety: {self.satiety}")
+        print(f"Gladness: {self.gladness}")
+        if self.home:
+            print(f"Food: {self.home.food}")
+            print(f"Mess: {self.home.mess}")
+        if self.car:
+            print(f"Car fuel: {self.car.fuel}")
+            print(f"Car strength: {self.car.strength}")
+
+    def is_alive(self):
+        if self.gladness <= 0:
+            print("Depression...")
+            return False
+        if self.satiety <= 0:
+            print("Died of hunger...")
+            return False
+        if self.money < -500:
+            print("Bankrupt...")
+            return False
+        return True
+
+    def live(self, day):
+        if not self.is_alive():
+            return False
+        if not self.home:
+            print("Settling in a new house...")
+            self.get_home()
+        if not self.car:
+            print("Buying a car...")
+            self.get_car()
+        if not self.job:
+            print("Getting a new job...")
+            self.get_job()
+
+        self.days_indexes(day)
+
+        dice = random.randint(1, 4)
+        if self.satiety < 20:
+            print("I need to eat.")
+            self.eat()
+        elif self.gladness < 20:
+            if self.home.mess > 15:
+                print("Cleaning the house.")
+                self.clean_house()
+            else:
+                print("Chilling...")
+                self.chill()
+        elif self.money < 0:
+            print("Time to work.")
+            self.work()
+        elif self.car and self.car.strength < 15:
+            print("Repairing the car...")
+            self.to_repair()
+        elif dice == 1:
+            self.chill()
+        elif dice == 2:
+            self.work()
+        elif dice == 3:
+            self.clean_house()
+        elif dice == 4:
+            self.shopping("delicacies")
+
+
+class Auto:
+    def __init__(self, brand_list):
+        self.brand = random.choice(list(brand_list.keys()))
+        self.fuel = brand_list[self.brand]["fuel"]
+        self.strength = brand_list[self.brand]["strength"]
+        self.consumption = brand_list[self.brand]["consumption"]
+
+    def drive(self):
+        if self.strength > 0 and self.fuel >= self.consumption:
+            self.fuel -= self.consumption
+            self.strength -= 1
+            return True
+        print("The car cannot move!")
+        return False
+
+
+class House:
+    def __init__(self):
+        self.mess = 0
+        self.food = 0
+
+
+class Job:
+    def __init__(self, jobs_list):
+        self.job = random.choice(list(jobs_list.keys()))
+        self.gladness_less = jobs_list[self.job]["gladness_less"]
+        self.salary = jobs_list[self.job]["salary"]
+
+
+brands_of_car = {
+    "BMW": {"fuel": 100, "strength": 100, "consumption": 6},
+    "Lada": {"fuel": 50, "strength": 40, "consumption": 10},
+    "Volvo": {"fuel": 70, "strength": 150, "consumption": 8},
+    "Ferrari": {"fuel": 80, "strength": 120, "consumption": 14},
+}
+
+jobs_list = {
+    "Java Developer": {"salary": 50, "gladness_less": 10},
+    "Python Developer": {"salary": 40, "gladness_less": 3},
+    "C++ Developer": {"salary": 45, "gladness_less": 25},
+    "Rust Developer": {"salary": 70, "gladness_less": 1},
+}
