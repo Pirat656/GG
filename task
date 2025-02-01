@@ -1,0 +1,78 @@
+class Task:
+    def init(self, title, description, deadline):
+        self.title = title
+        self.description = description
+        self.deadline = deadline
+        self.completed = False
+
+
+class TaskManager:
+    def init(self):
+        self.tasks = []
+
+    def add_task(self, task):
+        self.tasks.append(task)
+        print("Завдання додано.")
+
+    def delete_task(self, task_title):
+        for task in self.tasks:
+            if task.title == task_title:
+                self.tasks.remove(task)
+                print("Завдання видалено.")
+                return
+        print("Завдання не знайдено.")
+
+    def mark_task_completed(self, task_title):
+        for task in self.tasks:
+            if task.title == task_title:
+                task.completed = True
+                print("Завдання позначено як виконане.")
+                return
+        print("Завдання не знайдено.")
+
+    def show_tasks(self):
+        if not self.tasks:
+            print("Список завдань порожній.")
+            return
+        for task in self.tasks:
+            print("Назва:", task.title)
+            print("Опис:", task.description)
+            print("Дедлайн:", task.deadline)
+            print("Статус:", task.completed)
+            print()
+
+
+# Меню для взаємодії
+manager = TaskManager()
+
+while True:
+    print("""
+    Enter the number from 1 - 5:
+    1 - Add the task
+    2 - Delete the task
+    3 - Mark as completed
+    4 - Show all tasks
+    5 - Exit the menu
+    """)
+    ans = input("Enter your answer: ")
+
+    if ans == "1":
+        title = input("Назва завдання: ")
+        description = input("Опис завдання: ")
+        deadline = input("Дедлайн (у будь-якому форматі): ")
+        task = Task(title, description, deadline)
+        manager.add_task(task)
+    elif ans == "2":
+        title = input("Введіть назву завдання для видалення: ")
+        manager.delete_task(title)
+    elif ans == "3":
+        title = input("Введіть назву завдання для позначення як виконане: ")
+        manager.mark_task_completed(title)
+    elif ans == "4":
+        manager.show_tasks()
+    elif ans == "5":
+        print("Вихід з меню.")
+        break
+    else:
+        print("Невірний вибір. Спробуйте ще раз.")
+
